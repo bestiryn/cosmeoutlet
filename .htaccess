@@ -1,0 +1,9 @@
+# Cosme Outlet — clean URL สำหรับหน้าแอดมิน (ใช้ได้กับ hosting ที่เป็น Apache เท่านั้น)
+# ทำให้เข้าหน้าแอดมินได้ทาง /admin โดยไม่ต้องพิมพ์ .html
+RewriteEngine On
+RewriteRule ^admin/?$ admin.html [L]
+
+# กันไม่ให้ไฟล์ SQL schema ถูกเปิดดูผ่านเว็บโดยตรง
+<FilesMatch "\.sql$">
+  Require all denied
+</FilesMatch>

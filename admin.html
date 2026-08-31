@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบหลังบ้าน | Cosme Outlet</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/images/logo.jpg">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- ============ PIN gate ============ -->
+<section class="pin-screen" id="pin-screen">
+  <div class="pin-card">
+    <img src="assets/images/logo.jpg" alt="Cosme Outlet logo">
+    <h1>ระบบหลังบ้าน</h1>
+    <p class="pin-sub">กรอกรหัส PIN 6 หลักเพื่อเข้าจัดการสินค้า</p>
+    <div class="pin-inputs" id="pin-inputs">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+    </div>
+    <p class="pin-error" id="pin-error"></p>
+    <button class="btn btn-primary" id="pin-submit" style="width:100%;justify-content:center;">เข้าสู่ระบบ</button>
+  </div>
+</section>
+
+<!-- ============ Admin dashboard ============ -->
+<div id="admin-app" style="display:none;">
+
+  <header class="admin-header">
+    <div class="container">
+      <div class="admin-brand">
+        <img src="assets/images/logo.jpg" alt="Cosme Outlet logo">
+        <div>
+          Cosme Outlet
+          <small>ระบบจัดการสินค้าหลังบ้าน</small>
+        </div>
+      </div>
+      <div class="admin-actions">
+        <a href="index.html" class="btn btn-outline btn-sm" target="_blank" rel="noopener">ดูหน้าเว็บ</a>
+        <button class="btn btn-outline btn-sm" id="logout-btn">ออกจากระบบ</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="container">
+
+      <div class="admin-stats">
+        <div class="admin-stat"><strong id="stat-total">0</strong><span>สินค้าทั้งหมด</span></div>
+        <div class="admin-stat"><strong id="stat-perfume">0</strong><span>น้ำหอม</span></div>
+        <div class="admin-stat"><strong id="stat-skincare">0</strong><span>สกินแคร์</span></div>
+        <div class="admin-stat"><strong id="stat-cosmetics">0</strong><span>เครื่องสำอางค์</span></div>
+      </div>
+
+      <div class="admin-toolbar">
+        <div class="search-box">
+          <input type="search" id="search-input" placeholder="ค้นหาสินค้าจากชื่อ...">
+        </div>
+        <button class="btn btn-primary btn-sm" id="add-product-btn">+ เพิ่มสินค้าใหม่</button>
+      </div>
+
+      <div class="admin-status" id="admin-status"></div>
+
+      <div class="admin-table-wrap" id="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>รูป</th>
+              <th>ชื่อสินค้า</th>
+              <th>หมวดหมู่</th>
+              <th>ราคา</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="product-table-body"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ============ Add / edit product modal ============ -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal-box">
+    <h2 id="modal-title">เพิ่มสินค้าใหม่</h2>
+    <form id="product-form">
+      <input type="hidden" id="product-id">
+
+      <div class="form-field">
+        <label for="field-name">ชื่อสินค้า</label>
+        <input type="text" id="field-name" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="field-category">หมวดหมู่</label>
+          <select id="field-category" required>
+            <option value="perfume">น้ำหอม</option>
+            <option value="skincare">สกินแคร์</option>
+            <option value="cosmetics">เครื่องสำอางค์</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="field-price">ราคา (บาท)</label>
+          <input type="number" id="field-price" min="0" step="1" required>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="field-desc">รายละเอียดสินค้า</label>
+        <textarea id="field-desc" placeholder="คำอธิบายสั้น ๆ เกี่ยวกับสินค้า"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>รูปหน้าปก</label>
+        <div class="image-field">
+          <img id="image-preview" class="image-preview" src="assets/images/logo.jpg" alt="ตัวอย่างรูปสินค้า">
+          <div class="image-field-controls">
+            <input type="text" id="field-image-url" placeholder="วางลิงก์รูปภาพ หรืออัปโหลดไฟล์ด้านล่าง">
+            <input type="file" id="field-image-file" accept="image/*">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>รูปเพิ่มเติม (แกลเลอรีในหน้ารายละเอียดสินค้า)</label>
+        <div class="gallery-thumbs" id="gallery-thumbs"></div>
+        <input type="file" id="field-gallery-files" accept="image/*" multiple>
+      </div>
+
+      <p class="form-error" id="form-error"></p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline btn-sm" id="modal-cancel">ยกเลิก</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="modal-submit">บันทึกสินค้า</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
