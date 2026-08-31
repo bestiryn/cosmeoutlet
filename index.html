@@ -30,24 +30,32 @@
   </nav>
 </header>
 
-<section class="hero">
-  <div class="container hero-inner">
-    <div>
-      <span class="hero-eyebrow">Cosme Outlet</span>
-      <h1>น้ำหอม สกินแคร์ และเครื่องสำอางค์<br>แบรนด์เนมแท้ ในราคาเอาท์เล็ต</h1>
-      <p>เราคือร้าน Cosme Outlet ร้านรวมสินค้าความงามแบรนด์ดังจากทั่วโลก ทั้งน้ำหอม สกินแคร์ และเครื่องสำอางค์ คัดสรรของแท้ทุกชิ้น ในราคาที่คุณจับต้องได้ พร้อมส่งตรงถึงมือคุณ</p>
-      <div class="hero-actions">
-        <a href="products.html" class="btn btn-ghost">ดูสินค้าทั้งหมด</a>
-        <a href="contact.html" class="btn btn-ghost">ติดต่อสั่งซื้อ</a>
-      </div>
-      <div class="hero-stats">
-        <div><strong>3+</strong><span>หมวดหมู่สินค้า</span></div>
-        <div><strong>แท้ 100%</strong><span>การันตีของแท้ทุกชิ้น</span></div>
-        <div><strong>ส่งไว</strong><span>จัดส่งทั่วประเทศ</span></div>
-      </div>
+<section class="chat-hero" id="chat-hero">
+  <div class="container">
+    <div class="chat-hero-intro" id="chat-hero-intro">
+      <span class="eyebrow">Cosme Outlet</span>
+      <h1 id="chat-hero-title">แอดมินคอสเม่ พร้อมให้คำแนะนำค่ะ</h1>
+      <p>ร้านรวมน้ำหอม สกินแคร์ และเครื่องสำอางค์แบรนด์เนมแท้ ราคาเอาท์เล็ต ✨ ถามแอดมินคอสเม่ได้เลย ไม่ว่าจะหาสินค้า เช็คราคา หรือมีงบเท่าไหร่ก็บอกมาได้เลยค่ะ</p>
     </div>
-    <div class="hero-media">
-      <img src="assets/images/owner.jpg" alt="เจ้าของร้าน Cosme Outlet">
+
+    <div class="chat-hero-thread" id="chat-hero-thread"></div>
+
+    <form class="chat-hero-form" id="chat-hero-form">
+      <input type="text" id="chat-hero-input" placeholder="ถามแอดมินคอสเม่ได้เลยค่ะ เช่น น้ำหอมกลิ่นหอมหวาน หรือ สกินแคร์ไม่เกิน 300 บาท..." autocomplete="off">
+      <button type="submit" id="chat-hero-send" aria-label="ส่งข้อความ">&#10148;</button>
+    </form>
+
+    <div class="chat-hero-suggestions" id="chat-hero-suggestions">
+      <button type="button" class="chat-hero-chip" data-q="แนะนำน้ำหอมหน่อย">🌸 แนะนำน้ำหอม</button>
+      <button type="button" class="chat-hero-chip" data-q="แนะนำสกินแคร์หน่อย">✨ แนะนำสกินแคร์</button>
+      <button type="button" class="chat-hero-chip" data-q="แนะนำเครื่องสำอางค์หน่อย">💄 เครื่องสำอางค์</button>
+      <button type="button" class="chat-hero-chip" data-q="วิธีสั่งซื้อ">🛍️ วิธีสั่งซื้อ</button>
+    </div>
+
+    <div class="chat-hero-trust" id="chat-hero-trust">
+      <span>✓ ของแท้ 100%</span>
+      <span>🚚 จัดส่งทั่วประเทศ</span>
+      <span>🛍️ สินค้ากว่า 700 รายการ</span>
     </div>
   </div>
 </section>
@@ -163,35 +171,6 @@
     <div class="footer-bottom">&copy; 2026 Cosme Outlet. All rights reserved.</div>
   </div>
 </footer>
-
-<!-- ============ Chatbot: น้องคอสเม่ ============ -->
-<div id="chatbot-widget">
-  <button id="chatbot-toggle" aria-label="เปิดแชทกับน้องคอสเม่">
-    💬
-    <span class="chatbot-ping"></span>
-  </button>
-  <div id="chatbot-panel">
-    <div class="chatbot-header">
-      <img src="assets/images/logo.jpg" alt="น้องคอสเม่">
-      <div class="chatbot-title">
-        <strong>น้องคอสเม่</strong>
-        <span>ผู้ช่วยประจำร้าน Cosme Outlet</span>
-      </div>
-      <button id="chatbot-close" aria-label="ปิดแชท">&times;</button>
-    </div>
-    <div class="chatbot-messages" id="chatbot-messages"></div>
-    <div class="chatbot-quick-replies">
-      <button type="button" class="chatbot-chip" data-q="แนะนำน้ำหอมหน่อย">น้ำหอม 🌸</button>
-      <button type="button" class="chatbot-chip" data-q="แนะนำสกินแคร์หน่อย">สกินแคร์ ✨</button>
-      <button type="button" class="chatbot-chip" data-q="วิธีสั่งซื้อ">วิธีสั่งซื้อ</button>
-      <button type="button" class="chatbot-chip" data-q="ติดต่อร้าน">ติดต่อร้าน</button>
-    </div>
-    <form id="chatbot-form">
-      <input type="text" id="chatbot-input" placeholder="พิมพ์คำถามถึงน้องคอสเม่..." autocomplete="off">
-      <button type="submit" id="chatbot-send" aria-label="ส่งข้อความ">&#10148;</button>
-    </form>
-  </div>
-</div>
 
 <script src="assets/js/script.js"></script>
 <script src="assets/js/supabase-client.js"></script>

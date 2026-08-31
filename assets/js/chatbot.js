@@ -1,6 +1,13 @@
-// ===== Cosme Outlet — "น้องคอสเม่" chatbot widget =====
+// ===== Cosme Outlet — "แอดมินคอสเม่" chatbot engine =====
 // บอทค้นหาสินค้า/ตอบคำถามทั่วไปของร้าน จับคำสำคัญ (keyword) แล้วตอบด้วยข้อมูลจริงจาก Supabase
 // ไม่ได้เชื่อมกับ AI ภายนอกใด ๆ — ทำงานฝั่ง client ล้วน ๆ ไม่มีค่าใช้จ่ายเพิ่ม
+//
+// ไฟล์นี้ใช้ร่วมกัน 2 หน้าตา:
+// 1) หน้าแรก (index.html) — แชทแบบเต็มหน้า ("chat-hero-*" elements)
+// 2) หน้าอื่น ๆ — แชทแบบไอคอนลอยมุมขวาล่าง ("chatbot-*" elements)
+// initChatbot() ตรวจสอบเองว่าหน้านั้นมี element ไหนอยู่ แล้วเปิดใช้งานโหมดที่ตรงกัน
+
+const BOT_NAME = 'แอดมินคอสเม่';
 
 const CAT_LABEL_BOT = {
   perfume: 'น้ำหอม',
@@ -87,7 +94,7 @@ async function getBotReply(rawText) {
 
   // greeting
   if (includesAny(text, ['สวัสดี', 'หวัดดี', 'ดีจ้า', 'ดีค่ะ', 'ดีครับ', 'hello', 'hi ', 'ฮัลโหล'])) {
-    return { text: 'หวัดดีจ้า~ 💕 มีอะไรให้น้องคอสเม่ช่วยดูไหมคะ ถามชื่อสินค้า หมวดหมู่ (น้ำหอม/สกินแคร์/เครื่องสำอางค์) หรืองบประมาณที่มีก็ได้เลยน้า ✨' };
+    return { text: `หวัดดีจ้า~ 💕 มีอะไรให้${BOT_NAME}ช่วยดูไหมคะ ถามชื่อสินค้า หมวดหมู่ (น้ำหอม/สกินแคร์/เครื่องสำอางค์) หรืองบประมาณที่มีก็ได้เลยน้า ✨` };
   }
 
   // thanks
@@ -155,14 +162,14 @@ async function getBotReply(rawText) {
   if (found.length) {
     return {
       text: found.length === 1
-        ? `เจอแล้วจ้า! อันนี้เลยค่ะ ✨`
-        : `เจอหลายตัวเลย ลองดูอันนี้ก่อนนะคะ 💖`,
+        ? 'เจอแล้วจ้า! อันนี้เลยค่ะ ✨'
+        : 'เจอหลายตัวเลย ลองดูอันนี้ก่อนนะคะ 💖',
       products: found,
     };
   }
 
   return {
-    text: 'อันนี้น้องคอสเม่ไม่ค่อยแน่ใจอ่ะ 🥺 ลองพิมพ์ชื่อสินค้า หรือหมวดหมู่ (น้ำหอม/สกินแคร์/เครื่องสำอางค์) ดูนะคะ หรือจะทักแชทถามร้านโดยตรงทาง Facebook/LINE OA ก็ได้เลยจ้า 💕',
+    text: `อันนี้${BOT_NAME}ไม่ค่อยแน่ใจอ่ะ 🥺 ลองพิมพ์ชื่อสินค้า หรือหมวดหมู่ (น้ำหอม/สกินแคร์/เครื่องสำอางค์) ดูนะคะ หรือจะทักแชทถามร้านโดยตรงทาง Facebook/LINE OA ก็ได้เลยจ้า 💕`,
   };
 }
 
@@ -178,81 +185,92 @@ function productCardBotHTML(p) {
     </a>`;
 }
 
-function appendMessage(role, html) {
-  const wrap = document.getElementById('chatbot-messages');
-  const msg = document.createElement('div');
-  msg.className = `chatbot-msg ${role}`;
-  if (role === 'bot') {
-    msg.innerHTML = `<img class="chatbot-avatar" src="assets/images/logo.jpg" alt="">${html}`;
-  } else {
-    msg.innerHTML = html;
-  }
-  wrap.appendChild(msg);
-  wrap.scrollTop = wrap.scrollHeight;
-  return msg;
-}
-
-function appendBotBubble(text, products) {
-  let productsHTML = '';
-  if (products && products.length) {
-    productsHTML = `<div class="chatbot-products">${products.map(productCardBotHTML).join('')}</div>`;
-  }
-  appendMessage('bot', `<div class="chatbot-bubble">${escapeHTML(text)}${productsHTML}</div>`);
-}
-
-function appendUserBubble(text) {
-  appendMessage('user', `<div class="chatbot-bubble">${escapeHTML(text)}</div>`);
-}
-
 function escapeHTML(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
 
-function showTyping() {
-  const wrap = document.getElementById('chatbot-messages');
-  const msg = document.createElement('div');
-  msg.className = 'chatbot-msg bot';
-  msg.id = 'chatbot-typing-indicator';
-  msg.innerHTML = `<img class="chatbot-avatar" src="assets/images/logo.jpg" alt=""><div class="chatbot-bubble"><div class="chatbot-typing"><span></span><span></span><span></span></div></div>`;
-  wrap.appendChild(msg);
-  wrap.scrollTop = wrap.scrollHeight;
+/* ---------------- Reusable chat-thread controller ---------------- */
+// wrap ให้ทั้งโหมดป๊อปอัปและโหมดเต็มหน้าใช้ logic เดียวกัน ต่างกันแค่ container id
+
+function createChatController(threadEl) {
+  function appendMessage(role, html) {
+    const msg = document.createElement('div');
+    msg.className = `chatbot-msg ${role}`;
+    if (role === 'bot') {
+      msg.innerHTML = `<img class="chatbot-avatar" src="assets/images/logo.jpg" alt="">${html}`;
+    } else {
+      msg.innerHTML = html;
+    }
+    threadEl.appendChild(msg);
+    threadEl.scrollTop = threadEl.scrollHeight;
+    return msg;
+  }
+
+  function appendBotBubble(text, products) {
+    let productsHTML = '';
+    if (products && products.length) {
+      productsHTML = `<div class="chatbot-products">${products.map(productCardBotHTML).join('')}</div>`;
+    }
+    appendMessage('bot', `<div class="chatbot-bubble">${escapeHTML(text)}${productsHTML}</div>`);
+  }
+
+  function appendUserBubble(text) {
+    appendMessage('user', `<div class="chatbot-bubble">${escapeHTML(text)}</div>`);
+  }
+
+  function showTyping() {
+    const msg = document.createElement('div');
+    msg.className = 'chatbot-msg bot';
+    msg.id = `${threadEl.id}-typing`;
+    msg.innerHTML = `<img class="chatbot-avatar" src="assets/images/logo.jpg" alt=""><div class="chatbot-bubble"><div class="chatbot-typing"><span></span><span></span><span></span></div></div>`;
+    threadEl.appendChild(msg);
+    threadEl.scrollTop = threadEl.scrollHeight;
+  }
+
+  function hideTyping() {
+    document.getElementById(`${threadEl.id}-typing`)?.remove();
+  }
+
+  async function handleUserMessage(text, onFirstMessage) {
+    if (!text.trim()) return;
+    if (onFirstMessage) onFirstMessage();
+    appendUserBubble(text);
+    showTyping();
+    const start = Date.now();
+    const reply = await getBotReply(text);
+    const elapsed = Date.now() - start;
+    const minDelay = 450;
+    setTimeout(() => {
+      hideTyping();
+      appendBotBubble(reply.text, reply.products);
+    }, Math.max(0, minDelay - elapsed));
+  }
+
+  return { appendBotBubble, appendUserBubble, handleUserMessage };
 }
 
-function hideTyping() {
-  document.getElementById('chatbot-typing-indicator')?.remove();
-}
+/* ---------------- Mode 1: floating popup widget (ทุกหน้ายกเว้นหน้าแรก) ---------------- */
 
-async function handleUserMessage(text) {
-  if (!text.trim()) return;
-  appendUserBubble(text);
-  showTyping();
-  const start = Date.now();
-  const reply = await getBotReply(text);
-  const elapsed = Date.now() - start;
-  const minDelay = 450;
-  setTimeout(() => {
-    hideTyping();
-    appendBotBubble(reply.text, reply.products);
-  }, Math.max(0, minDelay - elapsed));
-}
-
-function initChatbot() {
+function initChatWidget() {
   const toggle = document.getElementById('chatbot-toggle');
   const panel = document.getElementById('chatbot-panel');
   const closeBtn = document.getElementById('chatbot-close');
   const form = document.getElementById('chatbot-form');
   const input = document.getElementById('chatbot-input');
+  const threadEl = document.getElementById('chatbot-messages');
 
-  if (!toggle || !panel) return;
+  if (!toggle || !panel || !threadEl) return;
+
+  const chat = createChatController(threadEl);
 
   let greeted = false;
   const openPanel = () => {
     panel.classList.add('open');
     if (!greeted) {
       greeted = true;
-      appendBotBubble('หวัดดีจ้า~ 💕 หนูชื่อ "น้องคอสเม่" เพื่อนซี้ประจำร้าน Cosme Outlet เองงง ✨\nอยากได้น้ำหอม สกินแคร์ หรือเครื่องสำอางค์ ทักมาถามได้เลยนะคะ หรือจะบอกงบประมาณมาก็ได้ เดี๋ยวหาให้เลยย 🥰');
+      chat.appendBotBubble(`หวัดดีจ้า~ 💕 หนูคือ "${BOT_NAME}" เพื่อนซี้ประจำร้าน Cosme Outlet เองงง ✨\nอยากได้น้ำหอม สกินแคร์ หรือเครื่องสำอางค์ ทักมาถามได้เลยนะคะ หรือจะบอกงบประมาณมาก็ได้ เดี๋ยวหาให้เลยย 🥰`);
     }
     input.focus();
   };
@@ -270,14 +288,51 @@ function initChatbot() {
     e.preventDefault();
     const text = input.value;
     input.value = '';
-    handleUserMessage(text);
+    chat.handleUserMessage(text);
   });
 
-  document.querySelectorAll('.chatbot-chip').forEach((chip) => {
-    chip.addEventListener('click', () => handleUserMessage(chip.dataset.q));
+  document.querySelectorAll('#chatbot-panel .chatbot-chip').forEach((chip) => {
+    chip.addEventListener('click', () => chat.handleUserMessage(chip.dataset.q));
   });
 
   ensureProducts();
 }
 
-document.addEventListener('DOMContentLoaded', initChatbot);
+/* ---------------- Mode 2: full-page hero chat (เฉพาะหน้าแรก) ---------------- */
+
+function initChatHero() {
+  const form = document.getElementById('chat-hero-form');
+  const input = document.getElementById('chat-hero-input');
+  const threadEl = document.getElementById('chat-hero-thread');
+  const introEl = document.getElementById('chat-hero-intro');
+  const suggestionsEl = document.getElementById('chat-hero-suggestions');
+  const trustEl = document.getElementById('chat-hero-trust');
+
+  if (!form || !input || !threadEl) return;
+
+  const chat = createChatController(threadEl);
+
+  const collapseIntro = () => {
+    introEl?.classList.add('collapsed');
+    suggestionsEl?.classList.add('collapsed');
+    trustEl?.classList.add('collapsed');
+  };
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = input.value;
+    input.value = '';
+    chat.handleUserMessage(text, collapseIntro);
+  });
+
+  document.querySelectorAll('#chat-hero-suggestions .chat-hero-chip').forEach((chip) => {
+    chip.addEventListener('click', () => chat.handleUserMessage(chip.dataset.q, collapseIntro));
+  });
+
+  ensureProducts();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initChatWidget();
+  initChatHero();
+});

@@ -7,6 +7,7 @@
 <meta name="description" content="รวมรีวิวและความประทับใจจากลูกค้าจริงของ Cosme Outlet ร้านน้ำหอม สกินแคร์ และเครื่องสำอางค์แบรนด์เนมแท้">
 <link rel="icon" href="assets/images/logo.jpg">
 <link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/chatbot.css">
 </head>
 <body>
 
@@ -111,6 +112,37 @@
   <img src="" alt="รีวิวขนาดใหญ่">
 </div>
 
+<!-- ============ Chatbot: แอดมินคอสเม่ ============ -->
+<div id="chatbot-widget">
+  <button id="chatbot-toggle" aria-label="เปิดแชทกับแอดมินคอสเม่">
+    💬
+    <span class="chatbot-ping"></span>
+  </button>
+  <div id="chatbot-panel">
+    <div class="chatbot-header">
+      <img src="assets/images/logo.jpg" alt="แอดมินคอสเม่">
+      <div class="chatbot-title">
+        <strong>แอดมินคอสเม่</strong>
+        <span>ผู้ช่วยประจำร้าน Cosme Outlet</span>
+      </div>
+      <button id="chatbot-close" aria-label="ปิดแชท">&times;</button>
+    </div>
+    <div class="chatbot-messages" id="chatbot-messages"></div>
+    <div class="chatbot-quick-replies">
+      <button type="button" class="chatbot-chip" data-q="แนะนำน้ำหอมหน่อย">น้ำหอม 🌸</button>
+      <button type="button" class="chatbot-chip" data-q="แนะนำสกินแคร์หน่อย">สกินแคร์ ✨</button>
+      <button type="button" class="chatbot-chip" data-q="วิธีสั่งซื้อ">วิธีสั่งซื้อ</button>
+      <button type="button" class="chatbot-chip" data-q="ติดต่อร้าน">ติดต่อร้าน</button>
+    </div>
+    <form id="chatbot-form">
+      <input type="text" id="chatbot-input" placeholder="พิมพ์คำถามถึงแอดมินคอสเม่..." autocomplete="off">
+      <button type="submit" id="chatbot-send" aria-label="ส่งข้อความ">&#10148;</button>
+    </form>
+  </div>
+</div>
+
 <script src="assets/js/script.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/chatbot.js"></script>
 </body>
 </html>
