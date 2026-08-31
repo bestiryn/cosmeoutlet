@@ -9,7 +9,16 @@ const SESSION_KEY = 'cosme_admin_session';
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 30000;
 
-const CAT_LABEL = { perfume: 'น้ำหอม', skincare: 'สกินแคร์', cosmetics: 'เครื่องสำอางค์' };
+const CAT_LABEL = {
+  perfume: 'น้ำหอม',
+  skincare: 'สกินแคร์',
+  cosmetics: 'เครื่องสำอางค์',
+  bags: 'กระเป๋า',
+  pouches: 'ถุง',
+  food: 'อาหาร',
+  supplements: 'อาหารเสริม',
+  general: 'ทั่วไป',
+};
 
 let allProducts = [];
 let currentGalleryImages = [];
@@ -124,7 +133,8 @@ function bootDashboard() {
     document.getElementById('image-preview').src = e.target.value || 'assets/images/logo.jpg';
   });
   document.getElementById('field-gallery-files').addEventListener('change', handleGalleryFiles);
-  document.getElementById('search-input').addEventListener('input', renderTable);
+  document.getElementById('search-input').addEventListener('input', () => { adminPage = 1; renderTable(); });
+  document.getElementById('category-filter-select').addEventListener('change', () => { adminPage = 1; renderTable(); });
 }
 
 async function loadProducts() {
@@ -151,16 +161,41 @@ function renderStats() {
   document.getElementById('stat-cosmetics').textContent = allProducts.filter((p) => p.category === 'cosmetics').length;
 }
 
+const ADMIN_PAGE_SIZE = 60;
+let adminPage = 1;
+
 function renderTable() {
   const query = (document.getElementById('search-input').value || '').trim().toLowerCase();
-  const list = query ? allProducts.filter((p) => p.name.toLowerCase().includes(query)) : allProducts;
+  const catFilter = document.getElementById('category-filter-select').value;
+  let list = query ? allProducts.filter((p) => p.name.toLowerCase().includes(query)) : allProducts;
+  if (catFilter) list = list.filter((p) => p.category === catFilter);
+
   const tbody = document.getElementById('product-table-body');
+  const pagerEl = document.getElementById('admin-pagination');
 
   if (!list.length) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--ink-soft);padding:30px;">ไม่พบสินค้า</td></tr>`;
+    pagerEl.innerHTML = '';
     return;
   }
 
+  const totalPages = Math.max(1, Math.ceil(list.length / ADMIN_PAGE_SIZE));
+  if (adminPage > totalPages) adminPage = totalPages;
+  const start = (adminPage - 1) * ADMIN_PAGE_SIZE;
+  const pageList = list.slice(start, start + ADMIN_PAGE_SIZE);
+
+  pagerEl.innerHTML = `
+    <button type="button" class="btn btn-outline btn-sm" id="admin-prev-page" ${adminPage <= 1 ? 'disabled' : ''}>&larr; ก่อนหน้า</button>
+    <span>หน้า ${adminPage} / ${totalPages} (${list.length} รายการ)</span>
+    <button type="button" class="btn btn-outline btn-sm" id="admin-next-page" ${adminPage >= totalPages ? 'disabled' : ''}>ถัดไป &rarr;</button>
+  `;
+  document.getElementById('admin-prev-page')?.addEventListener('click', () => { adminPage -= 1; renderTable(); });
+  document.getElementById('admin-next-page')?.addEventListener('click', () => { adminPage += 1; renderTable(); });
+
+  renderTableRows(pageList, tbody);
+}
+
+function renderTableRows(list, tbody) {
   tbody.innerHTML = list.map((p) => `
     <tr>
       <td><img class="admin-thumb" src="${p.image_url || 'assets/images/logo.jpg'}" alt="${p.name}" onerror="this.src='assets/images/logo.jpg'"></td>

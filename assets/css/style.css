@@ -381,6 +381,20 @@ h1, h2, h3, h4 { margin: 0 0 .5em; font-weight: 600; }
 .filter-btn:hover { border-color: var(--pink); color: var(--pink-dark); }
 .filter-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; }
 
+.search-bar { max-width: 420px; margin: 0 auto 30px; }
+.search-bar input {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  font-family: 'Prompt', sans-serif;
+  font-size: .92rem;
+  background: #fff;
+}
+.search-bar input:focus { outline: none; border-color: var(--pink); }
+
+.load-more-wrap { text-align: center; margin-top: 36px; }
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

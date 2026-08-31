@@ -45,14 +45,29 @@
       <button class="filter-btn" data-filter="perfume">น้ำหอม</button>
       <button class="filter-btn" data-filter="skincare">สกินแคร์</button>
       <button class="filter-btn" data-filter="cosmetics">เครื่องสำอางค์</button>
+      <button class="filter-btn" data-filter="supplements">อาหารเสริม</button>
+      <button class="filter-btn" data-filter="food">อาหาร</button>
+      <button class="filter-btn" data-filter="bags">กระเป๋า</button>
+      <button class="filter-btn" data-filter="pouches">ถุง</button>
+      <button class="filter-btn" data-filter="general">ทั่วไป</button>
     </div>
+
+    <div class="search-bar">
+      <input type="search" id="product-search" placeholder="ค้นหาสินค้าจากชื่อ...">
+    </div>
+
+    <p id="result-count" style="text-align:center;color:var(--ink-soft);font-size:.85rem;margin-bottom:20px;"></p>
 
     <div class="product-grid" id="product-grid">
       <p style="grid-column:1/-1;text-align:center;color:var(--ink-soft);">กำลังโหลดสินค้า...</p>
     </div>
     <div class="product-status" id="product-status"></div>
 
-    <p class="product-note">ต้องการสินค้ารุ่นอื่น ๆ เพิ่มเติม? เรามีสินค้าอีกกว่า 600 รายการในร้าน ทักแชทมาสอบถามได้ที่หน้า<a href="contact.html" style="color:var(--pink-dark);font-weight:600;"> ติดต่อร้าน</a></p>
+    <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
+      <button type="button" class="btn btn-outline" id="load-more-btn">โหลดสินค้าเพิ่มเติม</button>
+    </div>
+
+    <p class="product-note">หาสินค้าที่ต้องการไม่เจอ? ทักแชทมาสอบถามได้ที่หน้า<a href="contact.html" style="color:var(--pink-dark);font-weight:600;"> ติดต่อร้าน</a></p>
   </div>
 </section>
 

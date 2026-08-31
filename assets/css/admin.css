@@ -158,6 +158,27 @@ body.admin-body {
 }
 .admin-toolbar input[type="search"]:focus { outline: none; border-color: var(--pink); }
 
+.admin-cat-select {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  font-family: 'Prompt', sans-serif;
+  font-size: .85rem;
+  background: #fff;
+  color: var(--ink);
+}
+.admin-cat-select:focus { outline: none; border-color: var(--pink); }
+
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+  font-size: .85rem;
+  color: var(--ink-soft);
+}
+
 .admin-status {
   text-align: center;
   color: var(--ink-soft);

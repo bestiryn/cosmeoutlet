@@ -1,6 +1,15 @@
 // ===== Cosme Outlet — product-detail.html =====
 
-const CAT_LABEL = { perfume: 'น้ำหอม', skincare: 'สกินแคร์', cosmetics: 'เครื่องสำอางค์' };
+const CAT_LABEL = {
+  perfume: 'น้ำหอม',
+  skincare: 'สกินแคร์',
+  cosmetics: 'เครื่องสำอางค์',
+  bags: 'กระเป๋า',
+  pouches: 'ถุง',
+  food: 'อาหาร',
+  supplements: 'อาหารเสริม',
+  general: 'ทั่วไป',
+};
 
 function formatPrice(price) {
   const n = Number(price) || 0;

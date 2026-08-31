@@ -63,6 +63,17 @@
         <div class="search-box">
           <input type="search" id="search-input" placeholder="ค้นหาสินค้าจากชื่อ...">
         </div>
+        <select id="category-filter-select" class="admin-cat-select">
+          <option value="">ทุกหมวดหมู่</option>
+          <option value="perfume">น้ำหอม</option>
+          <option value="skincare">สกินแคร์</option>
+          <option value="cosmetics">เครื่องสำอางค์</option>
+          <option value="bags">กระเป๋า</option>
+          <option value="pouches">ถุง</option>
+          <option value="food">อาหาร</option>
+          <option value="supplements">อาหารเสริม</option>
+          <option value="general">ทั่วไป</option>
+        </select>
         <button class="btn btn-primary btn-sm" id="add-product-btn">+ เพิ่มสินค้าใหม่</button>
       </div>
 
@@ -82,6 +93,8 @@
           <tbody id="product-table-body"></tbody>
         </table>
       </div>
+
+      <div class="admin-pagination" id="admin-pagination"></div>
 
     </div>
   </main>
@@ -106,6 +119,11 @@
             <option value="perfume">น้ำหอม</option>
             <option value="skincare">สกินแคร์</option>
             <option value="cosmetics">เครื่องสำอางค์</option>
+            <option value="bags">กระเป๋า</option>
+            <option value="pouches">ถุง</option>
+            <option value="food">อาหาร</option>
+            <option value="supplements">อาหารเสริม</option>
+            <option value="general">ทั่วไป</option>
           </select>
         </div>
         <div class="form-field">
