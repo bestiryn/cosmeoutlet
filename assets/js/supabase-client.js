@@ -26,24 +26,74 @@ async function parseErrorMessage(res) {
   }
 }
 
-const CosmeDB = {
-  /** ดึงสินค้าทั้งหมด เรียงตามวันที่เพิ่มล่าสุดก่อน */
-  async listProducts() {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
-      headers: authHeaders(),
+// ข้อมูลสำรอง: สำเนาแคตตาล็อกของร้านที่เก็บไว้ในเว็บ (assets/data/products.json)
+// ใช้เฉพาะตอนที่ Supabase เชื่อมต่อไม่ได้ (เช่น โปรเจกต์ถูก pause/ลบ หรืออินเทอร์เน็ตมีปัญหา)
+// ในโหมดนี้เว็บอ่านสินค้าได้ตามปกติ แต่เพิ่ม/แก้ไข/ลบจากหน้า admin ไม่ได้
+const STATIC_PRODUCTS_URL = 'assets/data/products.json';
+const SUPABASE_TIMEOUT_MS = 8000;
+
+let productsCache = null;
+let staticProductsPromise = null;
+
+function loadStaticProducts() {
+  if (!staticProductsPromise) {
+    staticProductsPromise = fetch(STATIC_PRODUCTS_URL).then((r) => {
+      if (!r.ok) throw new Error('โหลดข้อมูลสินค้าสำรองไม่สำเร็จ');
+      return r.json();
     });
-    if (!res.ok) throw new Error(await parseErrorMessage(res));
-    return res.json();
+  }
+  return staticProductsPromise;
+}
+
+function fetchWithTimeout(url, options = {}) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), SUPABASE_TIMEOUT_MS);
+  return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+}
+
+const CosmeDB = {
+  /** true เมื่อ Supabase ใช้ไม่ได้และกำลังแสดงข้อมูลสำรองแบบอ่านอย่างเดียว */
+  usingFallback: false,
+
+  /** ดึงสินค้าทั้งหมด (จำผลไว้ตลอดอายุหน้า — หน้าเว็บเดียวกันเรียกซ้ำหลายจุดได้ไม่ต้องโหลดใหม่) */
+  listProducts() {
+    if (!productsCache) {
+      productsCache = (async () => {
+        try {
+          const res = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
+            headers: authHeaders(),
+          });
+          if (!res.ok) throw new Error(await parseErrorMessage(res));
+          CosmeDB.usingFallback = false;
+          return await res.json();
+        } catch (err) {
+          console.warn('Supabase ใช้ไม่ได้ ใช้ข้อมูลสำรองแทน:', err.message || err);
+          const list = await loadStaticProducts();
+          CosmeDB.usingFallback = true;
+          return list;
+        }
+      })();
+      productsCache.catch(() => { productsCache = null; });
+    }
+    return productsCache;
   },
 
   /** ดึงสินค้าชิ้นเดียวตาม id */
   async getProduct(id) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}&select=*`, {
-      headers: authHeaders(),
-    });
-    if (!res.ok) throw new Error(await parseErrorMessage(res));
-    const rows = await res.json();
-    return rows[0] || null;
+    try {
+      const res = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}&select=*`, {
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error(await parseErrorMessage(res));
+      const rows = await res.json();
+      CosmeDB.usingFallback = false;
+      return rows[0] || null;
+    } catch (err) {
+      console.warn('Supabase ใช้ไม่ได้ ใช้ข้อมูลสำรองแทน:', err.message || err);
+      const list = await loadStaticProducts();
+      CosmeDB.usingFallback = true;
+      return list.find((p) => String(p.id) === String(id)) || null;
+    }
   },
 
   async createProduct(product) {
@@ -56,6 +106,7 @@ const CosmeDB = {
       body: JSON.stringify(product),
     });
     if (!res.ok) throw new Error(await parseErrorMessage(res));
+    productsCache = null;
     const rows = await res.json();
     return rows[0];
   },
@@ -70,6 +121,7 @@ const CosmeDB = {
       body: JSON.stringify(product),
     });
     if (!res.ok) throw new Error(await parseErrorMessage(res));
+    productsCache = null;
     const rows = await res.json();
     return rows[0];
   },
@@ -80,6 +132,7 @@ const CosmeDB = {
       headers: authHeaders(),
     });
     if (!res.ok) throw new Error(await parseErrorMessage(res));
+    productsCache = null;
   },
 
   /** อัปโหลดรูปสินค้าไปที่ Supabase Storage แล้วคืน URL สาธารณะ */

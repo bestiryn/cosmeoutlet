@@ -146,6 +146,11 @@ async function loadProducts() {
     tableWrap.style.display = '';
     renderTable();
     renderStats();
+    if (CosmeDB.usingFallback) {
+      statusEl.style.display = 'block';
+      statusEl.style.marginBottom = '16px';
+      statusEl.textContent = '⚠️ เชื่อมต่อฐานข้อมูล Supabase ไม่ได้ ตอนนี้แสดงข้อมูลสำรองแบบอ่านอย่างเดียว — เพิ่ม/แก้ไข/ลบสินค้าจะยังไม่ทำงานจนกว่าจะกู้โปรเจกต์ Supabase กลับมา';
+    }
   } catch (err) {
     console.error(err);
     tableWrap.style.display = 'none';

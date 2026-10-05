@@ -137,6 +137,14 @@ async function loadProducts() {
       return;
     }
 
+    // ?q=คำค้น — มาจากลิงก์ "ดูทั้งหมดในหน้าสินค้า" ของแชทบอท
+    const qParam = new URLSearchParams(window.location.search).get('q');
+    if (qParam) {
+      currentSearch = qParam.trim();
+      const searchInput = document.getElementById('product-search');
+      if (searchInput) searchInput.value = currentSearch;
+    }
+
     bindFilterBar();
     bindSearch();
     bindLoadMore();
